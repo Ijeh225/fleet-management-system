@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO users (openId, username, passwordHash, name, email, loginMethod, isActive, role, createdAt, updatedAt, lastSignedIn)\nVALUES (\n  'local:admin',\n  'admin',\n  '$2b$12$t1ZmTlbXXfudeJNjHrgureuIGJAMZFJurZ4RjknFWW54vfQcta3d6',\n  'System Administrator',\n  'admin@fleet.local',\n  'local',\n  true,\n  'admin',\n  NOW(),\n  NOW(),\n  NOW()\n)\nON DUPLICATE KEY UPDATE\n  username = VALUES(username),\n  passwordHash = VALUES(passwordHash),\n  name = VALUES(name),\n  role = VALUES(role),\n  isActive = VALUES(isActive);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Ujr7Z7ufCVqC8J.51d6fd4bf8f7 --database CezdBerDJWQfisxHZj83HU --execute INSERT INTO users (openId, username, passwordHash, name, email, loginMethod, isActive, role, createdAt, updatedAt, lastSignedIn)\nVALUES (\n  'local:admin',\n  'admin',\n  '$2b$12$t1ZmTlbXXfudeJNjHrgureuIGJAMZFJurZ4RjknFWW54vfQcta3d6',\n  'System Administrator',\n  'admin@fleet.local',\n  'local',\n  true,\n  'admin',\n  NOW(),\n  NOW(),\n  NOW()\n)\nON DUPLICATE KEY UPDATE\n  username = VALUES(username),\n  passwordHash = VALUES(passwordHash),\n  name = VALUES(name),\n  role = VALUES(role),\n  isActive = VALUES(isActive);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 63
+}

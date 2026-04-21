@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE `drivers` MODIFY COLUMN `status` enum('active','inactive','on_leave') NOT NULL DEFAULT 'active';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Ujr7Z7ufCVqC8J.51d6fd4bf8f7 --database CezdBerDJWQfisxHZj83HU --execute ALTER TABLE `drivers` MODIFY COLUMN `status` enum('active','inactive','on_leave') NOT NULL DEFAULT 'active';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 212
+}

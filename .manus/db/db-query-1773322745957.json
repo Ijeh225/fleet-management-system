@@ -1,0 +1,74 @@
+{
+  "query": "SELECT c.name AS category, COUNT(p.id) AS part_count FROM categories c LEFT JOIN parts p ON p.categoryId = c.id GROUP BY c.id, c.name ORDER BY c.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3Ujr7Z7ufCVqC8J.51d6fd4bf8f7 --database CezdBerDJWQfisxHZj83HU --execute SELECT c.name AS category, COUNT(p.id) AS part_count FROM categories c LEFT JOIN parts p ON p.categoryId = c.id GROUP BY c.id, c.name ORDER BY c.id;",
+  "rows": [
+    {
+      "category": "Test Category",
+      "part_count": "0"
+    },
+    {
+      "category": "Test Category",
+      "part_count": "0"
+    },
+    {
+      "category": "Engine System",
+      "part_count": "19"
+    },
+    {
+      "category": "Cooling System",
+      "part_count": "10"
+    },
+    {
+      "category": "Fuel System",
+      "part_count": "6"
+    },
+    {
+      "category": "Air Intake System",
+      "part_count": "4"
+    },
+    {
+      "category": "Exhaust System",
+      "part_count": "6"
+    },
+    {
+      "category": "Transmission System",
+      "part_count": "7"
+    },
+    {
+      "category": "Drivetrain System",
+      "part_count": "6"
+    },
+    {
+      "category": "Brake System",
+      "part_count": "10"
+    },
+    {
+      "category": "Suspension System",
+      "part_count": "6"
+    },
+    {
+      "category": "Steering System",
+      "part_count": "7"
+    },
+    {
+      "category": "Electrical System",
+      "part_count": "11"
+    },
+    {
+      "category": "Cabin / Interior Parts",
+      "part_count": "9"
+    },
+    {
+      "category": "Wheels & Tires",
+      "part_count": "7"
+    },
+    {
+      "category": "Body Parts",
+      "part_count": "8"
+    }
+  ],
+  "messages": [],
+  "stdout": "category\tpart_count\nTest Category\t0\nTest Category\t0\nEngine System\t19\nCooling System\t10\nFuel System\t6\nAir Intake System\t4\nExhaust System\t6\nTransmission System\t7\nDrivetrain System\t6\nBrake System\t10\nSuspension System\t6\nSteering System\t7\nElectrical System\t11\nCabin / Interior Parts\t9\nWheels & Tires\t7\nBody Parts\t8\n",
+  "stderr": "",
+  "execution_time_ms": 47
+}

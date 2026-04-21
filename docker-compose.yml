@@ -1,0 +1,48 @@
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-fleet_management}
+      MYSQL_USER: ${MYSQL_USER:-fleet_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-fleet_password}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "127.0.0.1",
+          "-u${MYSQL_USER:-fleet_user}",
+          "-p${MYSQL_PASSWORD:-fleet_password}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  app:
+    build:
+      context: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: mysql://${MYSQL_USER:-fleet_user}:${MYSQL_PASSWORD:-fleet_password}@db:3306/${MYSQL_DATABASE:-fleet_management}
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    command: sh -c "pnpm db:migrate && node dist/index.js"
+
+volumes:
+  mysql_data:

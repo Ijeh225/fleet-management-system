@@ -1,0 +1,1 @@
+ALTER TABLE `drivers` MODIFY COLUMN `status` enum('active','inactive','on_leave') NOT NULL DEFAULT 'active';
