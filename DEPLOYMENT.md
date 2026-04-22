@@ -1,62 +1,74 @@
 # Deployment Guide
 
-## Recommended cloud target: Railway
+## Recommended cloud target: Render
 
-This repo now includes [railway.toml](C:\Users\SONOFGRACE\Documents\account_directory_app\fleet-management-system\railway.toml), which tells Railway to build from the `Dockerfile` and use `/api/health` as the deployment healthcheck.
+This repo now includes [render.yaml](C:\Users\SONOFGRACE\Documents\account_directory_app\fleet-management-system\render.yaml), which configures a Git-backed Docker web service with:
 
-### Railway setup
+- `main` branch deploys
+- `autoDeployTrigger: commit`
+- health checks at `/api/health`
+- `pnpm db:migrate` as the pre-deploy command
 
-1. Push this project to GitHub.
-2. In Railway, create a new project and add:
-   - one service from your GitHub repo
-   - one MySQL database service
-3. In the app service's Variables tab, set:
+### Render app service
+
+Create or sync a Render Blueprint from this repository, then provide these required environment variables when Render prompts for them:
+
+```env
+JWT_SECRET=<long-random-secret>
+DATABASE_URL=mysql://fleet_user:<MYSQL_PASSWORD>@<INTERNAL_HOST>:3306/fleet_management
+```
+
+The Blueprint already sets these non-secret values:
 
 ```env
 NODE_ENV=production
-PORT=3000
-JWT_SECRET=replace-with-a-long-random-secret
-DATABASE_URL=${{MySQL.MYSQL_URL}}
+PORT=10000
 ```
 
-4. Add these only if you use the related features:
+### Render MySQL service
+
+Use a private MySQL service in the same Render workspace and region with:
 
 ```env
-VITE_APP_ID=
-VITE_OAUTH_PORTAL_URL=
-OAUTH_SERVER_URL=
-OWNER_OPEN_ID=
-BUILT_IN_FORGE_API_URL=
-BUILT_IN_FORGE_API_KEY=
-VITE_FRONTEND_FORGE_API_URL=
-VITE_FRONTEND_FORGE_API_KEY=
+MYSQL_DATABASE=fleet_management
+MYSQL_USER=fleet_user
+MYSQL_PASSWORD=<strong-random-password>
+MYSQL_ROOT_PASSWORD=<different-strong-random-password>
 ```
 
-5. In the app service settings:
-   - confirm Railway is using the repo root
-   - confirm the detected `Dockerfile`
-   - set the pre-deploy command to `pnpm db:migrate`
-6. Deploy the staged changes.
+Keep the persistent disk mounted at:
 
-### Railway notes
+```text
+/var/lib/mysql
+```
 
-- Railway injects `PORT`, and its healthchecks use that port.
-- Railway's MySQL service exposes `MYSQLHOST`, `MYSQLPORT`, `MYSQLUSER`, `MYSQLPASSWORD`, `MYSQLDATABASE`, and `MYSQL_URL`; using `DATABASE_URL=${{MySQL.MYSQL_URL}}` is the simplest mapping.
-- If your MySQL service has a different name than `MySQL`, replace `MySQL` in the reference with your actual service name.
+Build the app's `DATABASE_URL` from the MySQL service's internal connection details:
+
+```text
+mysql://fleet_user:<MYSQL_PASSWORD>@<INTERNAL_HOST>:3306/fleet_management
+```
 
 ### Verify
 
-After deploy, open:
+After Render finishes deploying, open:
 
 ```text
-https://<your-railway-domain>/api/health
+https://<your-app>.onrender.com/api/health
 ```
 
-It should return a 200 response with `{"ok":true}`.
+Expected response:
+
+```json
+{"ok":true}
+```
+
+## Railway
+
+This repo also includes [railway.toml](C:\Users\SONOFGRACE\Documents\account_directory_app\fleet-management-system\railway.toml) if you prefer Railway later.
 
 ## Local Docker option
 
-If you want a local production-style stack instead, copy `.env.example` to `.env` and run:
+For a local production-style stack:
 
 ```bash
 docker-compose up --build -d

@@ -53,10 +53,12 @@ async function startServer() {
     serveStatic(app);
   }
 
-  const preferredPort = parseInt(process.env.PORT || "3000");
-  const port = await findAvailablePort(preferredPort);
+  const preferredPort = parseInt(process.env.PORT || (process.env.NODE_ENV === "production" ? "10000" : "3000"));
+  const port = process.env.NODE_ENV === "production"
+    ? preferredPort
+    : await findAvailablePort(preferredPort);
 
-  if (port !== preferredPort) {
+  if (process.env.NODE_ENV !== "production" && port !== preferredPort) {
     console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
   }
 

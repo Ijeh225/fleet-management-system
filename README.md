@@ -38,7 +38,8 @@ pnpm dev
 
 This repo is prepared for:
 
-- Railway cloud deployment
+- Render auto-deploy from GitHub
+- Railway deployment
 - Docker-based deployment
 
 See [DEPLOYMENT.md](C:\Users\SONOFGRACE\Documents\account_directory_app\fleet-management-system\DEPLOYMENT.md) for the full setup.

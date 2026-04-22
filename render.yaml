@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: fleet-management-system
+    runtime: docker
+    repo: https://github.com/Ijeh225/fleet-management-system.git
+    branch: main
+    plan: starter
+    autoDeployTrigger: commit
+    healthCheckPath: /api/health
+    preDeployCommand: pnpm db:migrate
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "10000"
+      - key: JWT_SECRET
+        sync: false
+      - key: DATABASE_URL
+        sync: false
