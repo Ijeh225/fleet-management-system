@@ -74,6 +74,13 @@ export async function getAllUsers() {
   return db.select().from(users).orderBy(desc(users.createdAt));
 }
 
+export async function getUserCount() {
+  const db = await getDb();
+  if (!db) return 0;
+  const result = await db.select({ count: sql<number>`count(*)` }).from(users);
+  return Number(result[0]?.count ?? 0);
+}
+
 export async function getUserByUsername(username: string) {
   const db = await getDb();
   if (!db) return undefined;

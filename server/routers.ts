@@ -25,6 +25,13 @@ export const appRouter = router({
   // ─── Auth ───────────────────────────────────────────────────────────────────
   auth: router({
     me: publicProcedure.query((opts) => opts.ctx.user),
+    setupStatus: publicProcedure.query(async () => {
+      const userCount = await db.getUserCount();
+      return {
+        hasUsers: userCount > 0,
+        setupRequired: userCount === 0,
+      };
+    }),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
@@ -54,6 +61,49 @@ export const appRouter = router({
         const cookieOptions = getSessionCookieOptions(ctx.req);
         ctx.res.cookie(COOKIE_NAME, token, cookieOptions);
         return { success: true, user: { id: user.id, name: user.name, role: user.role } };
+      }),
+    bootstrapAdmin: publicProcedure
+      .input(z.object({
+        username: z.string().min(3).max(64).regex(/^[a-zA-Z0-9_.-]+$/, "Username can only contain letters, numbers, underscores, dots, and hyphens"),
+        password: z.string().min(6, "Password must be at least 6 characters"),
+        name: z.string().min(1),
+        email: z.string().email().optional().or(z.literal("")),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const userCount = await db.getUserCount();
+        if (userCount > 0) {
+          throw new TRPCError({ code: "CONFLICT", message: "Initial admin setup has already been completed" });
+        }
+
+        const existing = await db.getUserByUsername(input.username);
+        if (existing) {
+          throw new TRPCError({ code: "CONFLICT", message: "Username already taken" });
+        }
+
+        const bcrypt = await import("bcryptjs");
+        const passwordHash = await bcrypt.hash(input.password, 12);
+        const user = await db.createLocalUser({
+          username: input.username,
+          passwordHash,
+          name: input.name,
+          email: input.email || undefined,
+          role: "admin",
+        });
+
+        const { sdk } = await import("./_core/sdk");
+        const token = await sdk.signSession({
+          openId: `local:${user.username}`,
+          appId: "fleet",
+          name: user.name ?? user.username ?? "",
+          localUserId: user.id,
+        });
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, token, cookieOptions);
+
+        return {
+          success: true,
+          user: { id: user.id, name: user.name, role: user.role },
+        };
       }),
   }),
   // ─── Users ───────────────────────────────────────────────────────────────────

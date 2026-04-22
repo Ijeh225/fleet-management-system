@@ -25,11 +25,13 @@ import StockRemoval from "./pages/StockRemoval";
 import AuditTrail from "./pages/AuditTrail";
 import PartsReorder from "./pages/PartsReorder";
 import Trips from "./pages/Trips";
+import Setup from "./pages/Setup";
 
 function Router() {
   return (
     <Switch>
       {/* Public route — no layout wrapper */}
+      <Route path="/setup" component={Setup} />
       <Route path="/login" component={Login} />
       {/* All other routes are wrapped in the authenticated dashboard layout */}
       <Route>

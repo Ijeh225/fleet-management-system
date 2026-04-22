@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
 import { Eye, EyeOff, Truck } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
 
@@ -15,6 +15,13 @@ export default function Login() {
   const [showPwd, setShowPwd] = useState(false);
 
   const utils = trpc.useUtils();
+  const { data: setupStatus, isLoading: setupStatusLoading } = trpc.auth.setupStatus.useQuery();
+
+  useEffect(() => {
+    if (!setupStatusLoading && setupStatus?.setupRequired) {
+      setLocation("/setup");
+    }
+  }, [setLocation, setupStatus?.setupRequired, setupStatusLoading]);
 
   const login = trpc.auth.login.useMutation({
     onSuccess: async () => {
@@ -32,6 +39,14 @@ export default function Login() {
     if (!username.trim() || !password) return;
     login.mutate({ username: username.trim(), password });
   };
+
+  if (setupStatusLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+        <p className="text-sm text-slate-300">Checking system status...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
